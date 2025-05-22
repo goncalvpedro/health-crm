@@ -5,10 +5,12 @@ const jwt = require("../utils/jwt");
 module.exports = {
   // POST /auth/register
   registerUser: async (req, res) => {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     try {
-      const existing = await prisma.users.findUnique({ where: { username } });
+      const existing = await prisma.users.findUnique({
+        where: { username: username },
+      });
       if (existing) {
         return res
           .status(400)
@@ -20,11 +22,12 @@ module.exports = {
       const user = await prisma.users.create({
         data: {
           username: username,
+          email: email,
           passwordHash: hashedPwd,
         },
       });
 
-      const token = jwt.signToken(user.id, user.username);
+      const token = jwt.signToken(user.id, user.email);
       res.status(201).json({
         token,
         message: "[ Success ] User registered successfully",
@@ -38,7 +41,7 @@ module.exports = {
 
   // POST /auth/login
   loginUser: async (req, res) => {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     try {
       const user = await prisma.users.findUnique({ where: { username } });
@@ -51,7 +54,7 @@ module.exports = {
         return res.status(400).json({ error: "[ Error ] Invalid credentials" });
       }
 
-      const token = jwt.signToken(user.id, user.username);
+      const token = jwt.signToken(user.id, user.email);
       res.json({ token });
     } catch (err) {
       return res.status(500).json({
@@ -68,6 +71,7 @@ module.exports = {
         select: {
           id: true,
           username: true,
+          email: true,
           role: true,
           createdAt: true,
         },
@@ -83,18 +87,25 @@ module.exports = {
   // PUT /auth/users/:id
   updateUser: async (req, res) => {
     let { id } = req.params;
-    const { newPassword, newRole } = req.body;
+    const { newEmail, newPassword, newRole } = req.body;
 
+    id = parseInt(id);
     try {
-      if (!newPassword) {
-        return res
-          .status(400)
-          .json({ error: "[ Error ] Missing new password" });
+      const user = prisma.users.findUnique({ where: { id } });
+      if (!user) {
+        return res.status(400).json({ error: "[ Error ] User not found." });
       }
 
-      id = parseInt(id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: "[ Error ] Invalid ID format" });
+      if (!newPassword) {
+        newPassword = user.password;
+      }
+
+      if (!newEmail) {
+        newEmail = user.email;
+      }
+
+      if (!newRole) {
+        newRole = user.role;
       }
 
       const hashedPwd = bcrypt.hashSync(newPassword, 10);
@@ -102,22 +113,18 @@ module.exports = {
       const updatedUser = await prisma.users.update({
         where: { id },
         data: {
+          email: newEmail,
           passwordHash: hashedPwd,
-          role: newRole,
-        },
-        select: {
-          id: true,
-          username: true,
-          role: true,
+          role: newRole ?? user.role,
         },
       });
 
-      return res.status(200).json({
-        user: updatedUser,
+      res.status(200).json({
+        user: { ...updatedUser, passwordHash: undefined },
         message: "[ Success ] User updated successfully",
       });
     } catch (err) {
-      return res.status(500).json({
+      res.status(500).json({
         error: `[ Error ] Internal error (updateUser): ${err.message}`,
       });
     }
