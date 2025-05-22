@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id           Int      @id @unique @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Patients {
+  id             Int              @id @unique @default(autoincrement())
+  fname          String
+  lname          String?
+  bday           DateTime         @db.Date
+  phone          String
+  email          String?          @unique
+  gender         Gender           @default(NULL)
+  address        String?
+  notes          String?          @db.Text
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
+  appointments   Appointments[]
+  medicalHistory MedicalHistory[]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  NULL
+}
+
+model Procedures {
+  id           Int            @id @unique @default(autoincrement())
+  procName     String
+  category     ProcCategory   @default(ACOMPANHAMENTO)
+  estDuration  String
+  price        Decimal        @db.Decimal(10, 2)
+  createdAt    DateTime       @default(now())
+  appointments Appointments[]
+}
+
+enum ProcCategory {
+  ACOMPANHAMENTO
+  ESTÉTICA
+  CIRURGIA
+  RESTAURAÇÃO
+  CANAL
+  CLAREAMENTO
+}
+
+model Appointments {
+  id        Int        @id @unique @default(autoincrement())
+  patient   Patients   @relation(fields: [patientId], references: [id])
+  patientId Int
+  procedure Procedures @relation(fields: [procId], references: [id])
+  procId    Int
+  apDate    DateTime   @db.Date
+  createdAt DateTime   @default(now())
+}
+
+model MedicalHistory {
+  id          Int      @id @unique @default(autoincrement())
+  patient     Patients @relation(fields: [patientId], references: [id])
+  patientId   Int
+  description String?
+  createdAt   DateTime @default(now())
+}
