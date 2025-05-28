@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
+model users {
   id           Int      @id @unique @default(autoincrement())
   username     String   @unique
   passwordHash String
@@ -22,20 +22,20 @@ enum Role {
   ADMIN
 }
 
-model Patients {
-  id             Int              @id @unique @default(autoincrement())
-  fname          String
-  lname          String?
-  bday           DateTime         @db.Date
-  phone          String
-  email          String?          @unique
-  gender         Gender           @default(NULL)
-  address        String?
-  notes          String?          @db.Text
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @default(now()) @updatedAt
-  appointments   Appointments[]
-  medicalHistory MedicalHistory[]
+model patients {
+  id              Int               @id @unique @default(autoincrement())
+  fname           String
+  lname           String?
+  bday            DateTime          @db.Date
+  phone           String            @unique
+  email           String?           @unique
+  gender          Gender            @default(NULL)
+  address         String?
+  notes           String?           @db.Text
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now()) @updatedAt
+  appointments    appointments[]
+  medical_history medical_history[]
 }
 
 enum Gender {
@@ -44,38 +44,39 @@ enum Gender {
   NULL
 }
 
-model Procedures {
+model procedures {
   id           Int            @id @unique @default(autoincrement())
   procName     String
-  category     ProcCategory   @default(ACOMPANHAMENTO)
+  category     ProcCategory   @default(NO_CATEGORY)
   estDuration  String
   price        Decimal        @db.Decimal(10, 2)
   createdAt    DateTime       @default(now())
-  appointments Appointments[]
+  updatedAt    DateTime       @default(now()) @updatedAt
+  appointments appointments[]
 }
 
 enum ProcCategory {
-  ACOMPANHAMENTO
+  NO_CATEGORY
+  ENDODONTIA
   ESTÉTICA
+  DENTÍSTICA
   CIRURGIA
-  RESTAURAÇÃO
-  CANAL
-  CLAREAMENTO
+  PRÓTESE
 }
 
-model Appointments {
+model appointments {
   id        Int        @id @unique @default(autoincrement())
-  patient   Patients   @relation(fields: [patientId], references: [id])
+  patient   patients   @relation(fields: [patientId], references: [id])
   patientId Int
-  procedure Procedures @relation(fields: [procId], references: [id])
+  procedure procedures @relation(fields: [procId], references: [id])
   procId    Int
   apDate    DateTime   @db.Date
   createdAt DateTime   @default(now())
 }
 
-model MedicalHistory {
+model medical_history {
   id          Int      @id @unique @default(autoincrement())
-  patient     Patients @relation(fields: [patientId], references: [id])
+  patient     patients @relation(fields: [patientId], references: [id])
   patientId   Int
   description String?
   createdAt   DateTime @default(now())

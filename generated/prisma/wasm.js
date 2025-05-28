@@ -149,7 +149,8 @@ exports.Prisma.ProceduresScalarFieldEnum = {
   category: 'category',
   estDuration: 'estDuration',
   price: 'price',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AppointmentsScalarFieldEnum = {
@@ -160,7 +161,7 @@ exports.Prisma.AppointmentsScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
-exports.Prisma.MedicalHistoryScalarFieldEnum = {
+exports.Prisma.Medical_historyScalarFieldEnum = {
   id: 'id',
   patientId: 'patientId',
   description: 'description',
@@ -193,20 +194,20 @@ exports.Gender = exports.$Enums.Gender = {
 };
 
 exports.ProcCategory = exports.$Enums.ProcCategory = {
-  ACOMPANHAMENTO: 'ACOMPANHAMENTO',
+  NO_CATEGORY: 'NO_CATEGORY',
+  ENDODONTIA: 'ENDODONTIA',
   ESTÉTICA: 'ESTÉTICA',
+  DENTÍSTICA: 'DENTÍSTICA',
   CIRURGIA: 'CIRURGIA',
-  RESTAURAÇÃO: 'RESTAURAÇÃO',
-  CANAL: 'CANAL',
-  CLAREAMENTO: 'CLAREAMENTO'
+  PRÓTESE: 'PRÓTESE'
 };
 
 exports.Prisma.ModelName = {
-  Users: 'Users',
-  Patients: 'Patients',
-  Procedures: 'Procedures',
-  Appointments: 'Appointments',
-  MedicalHistory: 'MedicalHistory'
+  users: 'users',
+  patients: 'patients',
+  procedures: 'procedures',
+  appointments: 'appointments',
+  medical_history: 'medical_history'
 };
 
 /**

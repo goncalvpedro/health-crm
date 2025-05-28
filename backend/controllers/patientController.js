@@ -4,7 +4,7 @@ module.exports = {
   // GET /patients
   listPatients: async (req, res) => {
     try {
-      const patients = await prisma.patients.findMany({ orderBy: {  }});
+      const patients = await prisma.patients.findMany();
       res.status(200).json({ patients });
     } catch (err) {
       res
