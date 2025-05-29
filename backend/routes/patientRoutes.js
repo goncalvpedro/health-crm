@@ -1,7 +1,13 @@
 const express = require('express')
+const { ensureAuth } = require("../middleware/auth-middleware");
+const patientController = require("../controllers/patientController");
 
-const router = express.Router()
+const patientRouter = express.Router()
 
-router.post('/register')
+patientRouter.get("/patients", patientController.listPatients);
+patientRouter.get("/patients/:id", patientController.getPatientById);
+patientRouter.post("/patients", patientController.createPatient);
+patientRouter.put("/patients/:id", patientController.updatePatient);
+patientRouter.delete("/patients/:id", patientController.deletePatient);
 
-module.exports = router;
+module.exports = patientRouter;
