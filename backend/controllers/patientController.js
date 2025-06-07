@@ -4,7 +4,9 @@ module.exports = {
   // GET /patients
   listPatients: async (req, res) => {
     try {
-      const patients = await prisma.patients.findMany({ orderBy: {  }});
+      const patients = await prisma.patients.findMany({
+        orderBy: { id: "asc" },
+      });
       res.status(200).json({ patients });
     } catch (err) {
       res
@@ -60,19 +62,19 @@ module.exports = {
       const updatedPatient = await prisma.patients.update({
         where: { id: parseInt(id) },
         data: {
-          fname: req.body.fname ?? prisma.patients.fname,
-          lname: req.body.lname ?? prisma.patients.lname,
-          bday: req.body.bday ?? prisma.patients.bday,
-          phone: req.body.phone ?? prisma.patients.phone,
-          email: req.body.email ?? prisma.patients.email,
-          gender: req.body.gender ?? prisma.patients.gender,
-          address: req.body.address ?? prisma.patients.address,
-          notes: req.body.notes ?? prisma.patients.notes,
+          fname: req.body.fname,
+          lname: req.body.lname,
+          bday: req.body.bday,
+          phone: req.body.phone,
+          email: req.body.email,
+          gender: req.body.gender,
+          address: req.body.address,
+          notes: req.body.notes,
         },
       });
       res.status(200).json({
         updatedPatient,
-        message: "[ Success } Patient updated successfully.",
+        message: "[ Success ] Patient updated successfully.",
       });
     } catch (err) {
       res

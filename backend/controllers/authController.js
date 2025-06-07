@@ -87,17 +87,17 @@ module.exports = {
   // PUT /auth/users/:id
   updateUser: async (req, res) => {
     let { id } = req.params;
-    const { newEmail, newPassword, newRole } = req.body;
+    let { newEmail, newPassword, newRole } = req.body;
 
     id = parseInt(id);
     try {
-      const user = prisma.users.findUnique({ where: { id } });
+      const user = await prisma.users.findUnique({ where: { id } });
       if (!user) {
         return res.status(400).json({ error: "[ Error ] User not found." });
       }
 
       if (!newPassword) {
-        newPassword = user.password;
+        newPassword = null;
       }
 
       if (!newEmail) {
@@ -108,7 +108,9 @@ module.exports = {
         newRole = user.role;
       }
 
-      const hashedPwd = bcrypt.hashSync(newPassword, 10);
+      const hashedPwd = newPassword
+        ? bcrypt.hashSync(newPassword, 10)
+        : user.passwordHash;
 
       const updatedUser = await prisma.users.update({
         where: { id },
